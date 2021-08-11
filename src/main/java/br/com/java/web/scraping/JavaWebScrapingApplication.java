@@ -1,4 +1,4 @@
-package com.algaworks.algafood;
+package br.com.java.web.scraping;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
