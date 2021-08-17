@@ -35,9 +35,23 @@ public class ScrapingUtil {
 			StatusPartida statusPartida = obtemStatusPartida(document);
 			LOGGER.info("Status partida : {}", statusPartida.toString());
 
+			if( statusPartida != StatusPartida.PARTIDA_NAO_INICIADA){
 			
 			LOGGER.info("Tempo partida : {}", obtemTempoPartida(document));
-;
+			};
+			
+			String nomeEquipeCasa = recuperaNomeEquipeCasa(document);
+			LOGGER.info("Nome equipe da casa: {}", nomeEquipeCasa);
+			
+			String urlLogoEquipeCasa = recuperaLogoEquipeCasa(document);
+			LOGGER.info("Url logo equipe da casa: {}", urlLogoEquipeCasa);
+
+			
+			String nomeEquipeVisitante = recuperaNomeEquipeVisitante(document);
+			LOGGER.info("Nome equipe visitante: {}", nomeEquipeVisitante);
+			
+			String urlLogoEquipeVisitante = recuperaLogoEquipeVisitante(document);
+			LOGGER.info("Url logo equipe visitante: {}", urlLogoEquipeVisitante);
 
 		} catch (IOException e) {
 			LOGGER.error("ERRO AO TENTAR CONECTAR NO GOOGLE COM JSOUP -> {}", e.getMessage());
@@ -45,6 +59,37 @@ public class ScrapingUtil {
 		}
 
 		return partida;
+	}
+
+
+
+	private String recuperaNomeEquipeVisitante(Document document) {
+		Element elemento = document.selectFirst("div[class=imso_mh__first-tn-ed imso_mh__tnal-cont imso-tnol]");
+		String nomeEquipe = elemento.select("span").text();
+		
+		return nomeEquipe;
+		}
+	
+	private String recuperaLogoEquipeVisitante(Document document) {
+		Element elemento = document.selectFirst("div[class=imso_mh__first-tn-ed imso_mh__tnal-cont imso-tnol]");
+		String urlLogo =  elemento.select("img[class=imso_btl__mh-logo]").attr("src");
+		
+		return urlLogo;
+	}
+
+	private String recuperaNomeEquipeCasa(Document document) {
+
+		Element elemento = document.selectFirst("div[class=imso_mh__second-tn-ed imso_mh__tnal-cont imso-tnol]");
+		String nomeEquipe = elemento.select("span").text();
+		
+		return nomeEquipe;
+	}
+	
+	private String recuperaLogoEquipeCasa(Document document) {
+		Element elemento = document.selectFirst("div[class=imso_mh__second-tn-ed imso_mh__tnal-cont imso-tnol]");
+		String urlLogo =  elemento.select("img[class=imso_btl__mh-logo]").attr("src");
+		
+		return urlLogo;
 	}
 
 	public StatusPartida obtemStatusPartida(Document document) {
@@ -87,9 +132,7 @@ public class ScrapingUtil {
 	public String corrigeTempoPartida(String tempo) {
 		if (tempo.contains("'")) {
 			return tempo.replace("'", " min");
-		} else if (tempo.contains("+")) {
-			return tempo.replace(" ", "").concat(" min");
-		} else {
+		}  else {
 			return tempo;
 		}
 	}
