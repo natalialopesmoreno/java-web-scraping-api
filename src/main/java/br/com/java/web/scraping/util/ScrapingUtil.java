@@ -18,7 +18,7 @@ public class ScrapingUtil {
 
 	public static void main(String[] args) {
 
-		String url = BASE_URL_GOOGLE + "corinthians+x+palmeiras+08/08/2020";
+		String url = BASE_URL_GOOGLE + "brasil+x+bolivia+09/10/2020";
 
 		ScrapingUtil scraping = new ScrapingUtil();
 		scraping.obtemInfoPartida(url);
@@ -38,6 +38,12 @@ public class ScrapingUtil {
 			if( statusPartida != StatusPartida.PARTIDA_NAO_INICIADA){
 			
 			LOGGER.info("Tempo partida : {}", obtemTempoPartida(document));
+			
+			Integer placarEquipeCasa = recuperarPlacarEquipeCasa(document);
+			LOGGER.info("Quantidade de gols da equipe da casa :" + placarEquipeCasa);
+			
+			Integer placarEquipeVisitante = recuperarPlacarEquipeVisitante(document);
+			LOGGER.info("Quantidade de gols da equipe visitante :" + placarEquipeVisitante);
 			};
 			
 			String nomeEquipeCasa = recuperaNomeEquipeCasa(document);
@@ -63,7 +69,18 @@ public class ScrapingUtil {
 
 
 
-	private String recuperaNomeEquipeVisitante(Document document) {
+	private Integer recuperarPlacarEquipeVisitante(Document document) {
+		String placarDaCasa = document.select("div[class=imso_mh__r-tm-sc imso_mh__scr-it imso-light-font]").text();
+		return Integer.valueOf(placarDaCasa);
+	}
+
+	private Integer recuperarPlacarEquipeCasa(Document document) {
+		
+		String placarDaCasa = document.select("div[class=imso_mh__l-tm-sc imso_mh__scr-it imso-light-font]").text();
+		return Integer.valueOf(placarDaCasa);
+	}
+
+	private String recuperaNomeEquipeCasa(Document document) {
 		Element elemento = document.selectFirst("div[class=imso_mh__first-tn-ed imso_mh__tnal-cont imso-tnol]");
 		String nomeEquipe = elemento.select("span").text();
 		
@@ -77,7 +94,7 @@ public class ScrapingUtil {
 		return urlLogo;
 	}
 
-	private String recuperaNomeEquipeCasa(Document document) {
+	private String recuperaNomeEquipeVisitante(Document document) {
 
 		Element elemento = document.selectFirst("div[class=imso_mh__second-tn-ed imso_mh__tnal-cont imso-tnol]");
 		String nomeEquipe = elemento.select("span").text();
