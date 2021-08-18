@@ -1,6 +1,8 @@
 package br.com.java.web.scraping.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,10 +17,14 @@ public class ScrapingUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScrapingUtil.class);
 	private static final String BASE_URL_GOOGLE = "https://www.google.com.br/search?q=";
+	
+	private static final String CASA = "casa";
+	private static final String VISITANTE = "visitante";
+
 
 	public static void main(String[] args) {
 
-		String url = BASE_URL_GOOGLE + "brasil+x+bolivia+09/10/2020";
+		String url = BASE_URL_GOOGLE + "corinthians+x+palmeiras+08/08/2020";
 
 		ScrapingUtil scraping = new ScrapingUtil();
 		scraping.obtemInfoPartida(url);
@@ -40,10 +46,25 @@ public class ScrapingUtil {
 			LOGGER.info("Tempo partida : {}", obtemTempoPartida(document));
 			
 			Integer placarEquipeCasa = recuperarPlacarEquipeCasa(document);
-			LOGGER.info("Quantidade de gols da equipe da casa :" + placarEquipeCasa);
+			LOGGER.info("Placar da equipe da casa :" + placarEquipeCasa);
+			
+			String goalsEquipeCasa = recuperarGoalsEquipeCasa(document);
+			LOGGER.info("Gols da equipe da casa : " + goalsEquipeCasa);
 			
 			Integer placarEquipeVisitante = recuperarPlacarEquipeVisitante(document);
-			LOGGER.info("Quantidade de gols da equipe visitante :" + placarEquipeVisitante);
+			LOGGER.info("Placar da equipe visitante :" + placarEquipeVisitante);
+			
+			String goalsEquipeVisitante = recuperarGoalsEquipeVisitante(document);
+			LOGGER.info("Gols da equipe visitante : " + goalsEquipeVisitante);
+			
+			Integer placarEstendidoEquipeCasa = buscaPenalidades(document, CASA);
+			LOGGER.info("Placar estendido equipe da casa :" + placarEstendidoEquipeCasa);
+			
+			Integer placarEstendidoEquipeVisitante = buscaPenalidades(document, VISITANTE);
+			LOGGER.info("Placar estendido visitante :" + placarEstendidoEquipeVisitante);
+
+			
+			
 			};
 			
 			String nomeEquipeCasa = recuperaNomeEquipeCasa(document);
@@ -69,32 +90,82 @@ public class ScrapingUtil {
 
 
 
-	private Integer recuperarPlacarEquipeVisitante(Document document) {
-		String placarDaCasa = document.select("div[class=imso_mh__r-tm-sc imso_mh__scr-it imso-light-font]").text();
-		return Integer.valueOf(placarDaCasa);
+	public Integer buscaPenalidades(Document document, String tipoEquipe) {
+
+		boolean isPenalidades = document.select("div[class=imso_mh_s__psn-sc]").isEmpty();
+		if(!isPenalidades) {
+			String penalidades = document.select("div[class=imso_mh_s__psn-sc]").text();
+			String penalidadesCompleta = penalidades.substring(0,5).replace(" ", "");
+			String [] divisao = penalidadesCompleta.split("-");
+			LOGGER.info("penalidades: " + penalidades);
+			
+			return tipoEquipe.equals(CASA) ? formataPlacarStringInteger(divisao[0]) : formataPlacarStringInteger(divisao[1]);
+		}
+		
+		return null;
+	}
+	
+	public Integer formataPlacarStringInteger(String placar) {
+		Integer valor;
+		try {
+			valor = Integer.parseInt(placar);
+		}catch(Exception e){
+			valor = 0;
+		}
+		return valor;
 	}
 
-	private Integer recuperarPlacarEquipeCasa(Document document) {
+	public String recuperarGoalsEquipeVisitante(Document document) {
+		List<String> goalsEquipe = new ArrayList<String>();
+		Elements elementos = document.select("div[class=imso_gs__tgs imso_gs__right-team]").select("div[class=imso_gs__gs-r]");
+		
+		elementos.forEach(e ->{
+			String infoGol = e.select("div[class=imso_gs__gs-r]").text();
+			goalsEquipe.add(infoGol);
+		}); 
+		
+		return String.join(", ", goalsEquipe);
+	}
+
+	public String recuperarGoalsEquipeCasa(Document document) {
+		
+		List<String> goalsEquipe = new ArrayList<String>();
+		Elements elementos = document.select("div[class=imso_gs__tgs imso_gs__left-team]").select("div[class=imso_gs__gs-r]");
+		
+		for(Element e : elementos) {
+			String infoGol = e.select("div[class=imso_gs__gs-r]").text();
+			goalsEquipe.add(infoGol);
+		}
+		
+		return String.join(", ", goalsEquipe);
+	}
+
+	public Integer recuperarPlacarEquipeVisitante(Document document) {
+		String placarDaCasa = document.select("div[class=imso_mh__r-tm-sc imso_mh__scr-it imso-light-font]").text();
+		return formataPlacarStringInteger(placarDaCasa);
+	}
+
+	public Integer recuperarPlacarEquipeCasa(Document document) {
 		
 		String placarDaCasa = document.select("div[class=imso_mh__l-tm-sc imso_mh__scr-it imso-light-font]").text();
-		return Integer.valueOf(placarDaCasa);
+		return formataPlacarStringInteger(placarDaCasa);
 	}
 
-	private String recuperaNomeEquipeCasa(Document document) {
+	public String recuperaNomeEquipeCasa(Document document) {
 		Element elemento = document.selectFirst("div[class=imso_mh__first-tn-ed imso_mh__tnal-cont imso-tnol]");
 		String nomeEquipe = elemento.select("span").text();
 		
 		return nomeEquipe;
 		}
 	
-	private String recuperaLogoEquipeVisitante(Document document) {
+	public String recuperaLogoEquipeVisitante(Document document) {
 		Element elemento = document.selectFirst("div[class=imso_mh__first-tn-ed imso_mh__tnal-cont imso-tnol]");
 		String urlLogo =  elemento.select("img[class=imso_btl__mh-logo]").attr("src");
 		
 		return urlLogo;
 	}
 
-	private String recuperaNomeEquipeVisitante(Document document) {
+	public String recuperaNomeEquipeVisitante(Document document) {
 
 		Element elemento = document.selectFirst("div[class=imso_mh__second-tn-ed imso_mh__tnal-cont imso-tnol]");
 		String nomeEquipe = elemento.select("span").text();
@@ -102,7 +173,7 @@ public class ScrapingUtil {
 		return nomeEquipe;
 	}
 	
-	private String recuperaLogoEquipeCasa(Document document) {
+	public String recuperaLogoEquipeCasa(Document document) {
 		Element elemento = document.selectFirst("div[class=imso_mh__second-tn-ed imso_mh__tnal-cont imso-tnol]");
 		String urlLogo =  elemento.select("img[class=imso_btl__mh-logo]").attr("src");
 		
