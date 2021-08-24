@@ -19,7 +19,7 @@ public class SwaggerConfig {
 	
 	private static final String BASE_PACKAGE = "br.com.java.web.scraping.controller";
 	private static final String API_TITULO = "Brasileirao API - Scraping";
-	private static final String API_DESCRICAO = "Curso de Web Scraping Java- API REST que obtem dados de partidadas de Brasileirão em tempo real";
+	private static final String API_DESCRICAO = "Curso de Web Scraping Java- API REST que obtem dados de partidas de Brasileirão em tempo real";
 	private static final String API_VERSAO = "1.0.0";
 	private static final String CONTATO_NOME = "Natalia Lopes Moreno";
 	private static final String CONTATO_GITHUB = "https://github.com/natalialopesmoreno";
