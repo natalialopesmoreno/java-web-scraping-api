@@ -13,9 +13,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EquipeDTO implements Serializable {/**
-	 * 
-	 */
+public class EquipeDTO implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 	
 	@NotBlank
