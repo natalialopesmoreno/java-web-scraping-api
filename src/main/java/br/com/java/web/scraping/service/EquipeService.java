@@ -45,7 +45,7 @@ public class EquipeService {
 		boolean exists = equipeRepository.existsByNomeEquipe(dto.getNomeEquipe());
 		
 		if(exists) {
-			throw new BadRequestException("Jã existe uma queipe cadastrada com o nome informado");
+			throw new BadRequestException("Já existe uma queipe cadastrada com o nome informado");
 		}
 		
 		Equipe equipe = model.map(dto, Equipe.class);
