@@ -58,7 +58,7 @@ public class ScrapingUtil {
 			LOGGER.info("Título da página : {}", title);
 
 			StatusPartida statusPartida = obtemStatusPartida(document);
-			partida.setStatusPartida(statusPartida.toString());
+			partida.setStatusPartida(statusPartida);
 			LOGGER.info("Status partida : {}", statusPartida.toString());
 
 			if( statusPartida != StatusPartida.PARTIDA_NAO_INICIADA){
@@ -83,11 +83,11 @@ public class ScrapingUtil {
 			LOGGER.info("Gols da equipe visitante : " + goalsEquipeVisitante);
 			
 			Integer placarEstendidoEquipeCasa = buscaPenalidades(document, CASA);
-			partida.setPlacarEstendidoEquipeCasa(placarEstendidoEquipeCasa.toString());
+			partida.setPlacarEstendidoEquipeCasa(placarEstendidoEquipeCasa);
 			LOGGER.info("Placar estendido equipe da casa :" + placarEstendidoEquipeCasa);
 			
 			Integer placarEstendidoEquipeVisitante = buscaPenalidades(document, VISITANTE);
-			partida.setPlacarEstendidoEquipeVisitante(placarEstendidoEquipeVisitante.toString());
+			partida.setPlacarEstendidoEquipeVisitante(placarEstendidoEquipeVisitante);
 			LOGGER.info("Placar estendido visitante :" + placarEstendidoEquipeVisitante);
 
 			
@@ -230,6 +230,18 @@ public class ScrapingUtil {
 			String equipeVisitante = nomeEquipeVisitante.replace(" ", "+").replace("-", "+").toLowerCase();
 			String data = dataJogo.replace(" ", "").replace("-", "/");
 			return BASE_URL_GOOGLE + equipeCasa + "x" + equipeVisitante + data;
+		}catch(Exception e) {
+			LOGGER.info("ERRO: " + e.getMessage());
+		}
+		
+		return null;
+	}
+	
+	public String montaUrlGoogle(String nomeEquipeCasa , String nomeEquipeVisitante) {
+		try {
+			String equipeCasa = nomeEquipeCasa.replace(" ", "+").replace("-", "+").toLowerCase();
+			String equipeVisitante = nomeEquipeVisitante.replace(" ", "+").replace("-", "+").toLowerCase();
+			return BASE_URL_GOOGLE + equipeCasa + "x" + equipeVisitante;
 		}catch(Exception e) {
 			LOGGER.info("ERRO: " + e.getMessage());
 		}
